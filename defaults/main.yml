@@ -1,0 +1,42 @@
+---
+
+spampd_packages: [ 'spampd', 'razor', 'pyzor', 'libmail-dkim-perl' ]
+
+spampd_autoupdate_rules: True
+
+spampd_filter_daemon_name: 'spampd'
+
+spampd_filter_listen_address: '127.0.0.1'
+spampd_filter_service_name: 'spampd'
+spampd_filter_service_port: '10025'
+
+spampd_relay_listen_address: '127.0.0.1'
+spampd_relay_service_name: 'smtp-int'
+spampd_relay_service_port: '10026'
+
+spampd_relay_maxproc: '20'
+
+spampd_relay_options: |
+  -o smtpd_authorized_xforward_hosts=127.0.0.0/8
+  -o smtpd_client_restrictions=
+  -o smtpd_helo_restrictions=
+  -o smtpd_sender_restrictions=
+  -o smtpd_relay_restrictions=
+  -o smtpd_recipient_restrictions=permit_mynetworks,reject
+  -o smtpd_data_restrictions=
+  -o mynetworks=127.0.0.0/8
+  -o receive_override_options=no_unknown_recipient_checks
+  # Remove default spam stuff from this relay
+  -o smtpd_proxy_filter=
+  -o smtpd_proxy_options=
+
+spampd_maincf_options:
+  - param: 'smtpd_proxy_filter'
+    value: '{{ spampd_filter_listen_address + ":" + spampd_filter_service_port }}'
+    capability: 'mx'
+  - param: 'smtpd_client_connection_count_limit'
+    value: '10'
+    capability: 'mx'
+  - param: 'sptpd_proxy_options'
+    value: 'speed_adjust'
+    capability: 'mx'

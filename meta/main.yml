@@ -1,0 +1,26 @@
+---
+
+dependencies:
+  - role: debops.etc_services
+    etc_services_list:
+      - name: '{{ spampd_filter_service_name }}'
+        port: '{{ spampd_filter_service_port }}'
+        protocol: [ 'tcp' ]
+        comment: 'Spamassassin Proxy service'
+      - name: '{{ spampd_relay_service_name }}'
+        port: '{{ spampd_relay_service_port }}'
+        protocol: [ 'tcp' ]
+        comment: 'Internal Post-Filter SMTP service'
+    
+  - role: debops.postfix
+    postfix_dependent_maincf: '{{ spampd_maincf_options }}'
+    postfix_dependent_mastercf:
+      - service: '{{ spampd_relay_listen_address + ":" + spampd_relay_service_port }}'
+        type: 'inet'
+        command: 'smtpd'
+        private: 'n'
+        maxproc: '{{ spampd_relay_maxproc }}'
+        options: '{{ spampd_relay_options }}'
+        capability: 'mx'
+    tags: postfix
+

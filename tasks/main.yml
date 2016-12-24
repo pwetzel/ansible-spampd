@@ -1,0 +1,38 @@
+---
+
+- name: Install Spamassassin Proxy Daemon packages
+  apt: 
+    name: '{{ item }}'
+    state: latest 
+    install_recommends: yes
+  with_items: '{{ spampd_packages }}'
+
+- name: Divert original Spamassassin configuration
+  command: dpkg-divert --quiet --local --divert /etc/{{ item }}.dpkg-divert --rename /etc/{{ item }}
+    creates=/etc/{{ item }}.dpkg-divert
+  with_items: [ 'spamassassin/local.cf', 'default/spamassassin' ]
+  notify: [ 'Restart spampd' ]
+
+- name: Disable spamd
+  service:
+    name: 'spamassassin'
+    state: stopped
+    enabled: no
+
+- name: Install spampd reload hook
+  template:
+    src: '{{ lookup("template_src", "etc/spamassassin/sa-update-hooks.d/spampd-reload.j2") }}'
+    dest: '/etc/spamassassin/sa-update-hooks.d/spampd-reload'
+    owner: root
+    group: root
+    mode: 0744
+
+- name: Install spamassassin configuration
+  template:
+    src: '{{ lookup("template_src", "etc/" + item + ".j2") }}'
+    dest: /etc/{{ item }}
+    owner: root
+    group: root
+    mode: 0644
+  with_items: [ 'spamassassin/local.cf', 'default/spamassassin' ]
+  notify: [ 'Restart spampd' ]

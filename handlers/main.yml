@@ -1,0 +1,6 @@
+---
+
+- name: Restart spampd 
+  service:
+    name: '{{ spampd_filter_daemon_name }}'
+    state: 'restarted'
