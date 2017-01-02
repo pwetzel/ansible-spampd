@@ -37,6 +37,12 @@
 #   Use Bayesian classifier (default: 1)
 #
 # use_bayes 1
+{%if (spampd_enable_checks_bayes is defined and spampd_enable_checks_bayes) %}
+use_bayes 1
+{%else %}
+use_bayes 0
+{%endif %}
+
 
 
 #   Bayesian classifier auto-learning (default: 1)
@@ -78,8 +84,10 @@ ifplugin Mail::SpamAssassin::Plugin::Shortcircuit
 
 #   and a well-trained bayes DB can save running rules, too
 #
-# shortcircuit BAYES_99                spam
-# shortcircuit BAYES_00                ham
+shortcircuit BAYES_99                spam
+shortcircuit BAYES_00                ham
 
 endif # Mail::SpamAssassin::Plugin::Shortcircuit
 
+bayes_path {{ spampd_bayes_path }}
+bayes_file_mode {{ spampd_bayes_file_mode }}

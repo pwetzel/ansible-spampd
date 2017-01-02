@@ -10,7 +10,10 @@
 - name: Divert original Spamassassin configuration
   command: dpkg-divert --quiet --local --divert /etc/{{ item }}.dpkg-divert --rename /etc/{{ item }}
     creates=/etc/{{ item }}.dpkg-divert
-  with_items: [ 'spamassassin/local.cf', 'default/spamassassin' ]
+  with_items: 
+    - 'spamassassin/local.cf'
+    - 'default/spamassassin'
+    - 'default/spampd'
   notify: [ 'Restart spampd' ]
 
 - name: Disable spamd
@@ -34,5 +37,13 @@
     owner: root
     group: root
     mode: 0644
-  with_items: [ 'spamassassin/local.cf', 'default/spamassassin' ]
+  with_items: 
+    - 'spamassassin/local.cf'
+    - 'default/spamassassin'
+    - 'default/spampd'
   notify: [ 'Restart spampd' ]
+
+- name: Put Debian spamassassin user in spampd group
+  user:
+    name: debian-spamd
+    groups: spampd

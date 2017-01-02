@@ -4,6 +4,12 @@ spampd_packages: [ 'spampd', 'razor', 'pyzor', 'libmail-dkim-perl' ]
 
 spampd_autoupdate_rules: True
 
+spampd_enable_checks_network: True
+spampd_enable_checks_bayes: True
+
+spampd_bayes_path: '/var/cache/spampd/bayes'
+spampd_bayes_file_mode: '0770'
+
 spampd_filter_daemon_name: 'spampd'
 
 spampd_filter_listen_address: '127.0.0.1'
